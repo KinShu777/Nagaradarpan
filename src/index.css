@@ -2774,3 +2774,86 @@ button, .action-btn, .filter-btn {
     font-size: 2rem;
   }
 }
+
+/* ========================================================================= */
+/* FORCED MOBILE RESPONSIVENESS OVERRIDES FOR SUBPAGES (PROFILE & DETAILS)   */
+/* ========================================================================= */
+@media screen and (max-width: 768px) {
+  /* Profile Page Grids */
+  .profile-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+    width: 100% !important;
+  }
+  .main-column, .side-column {
+    width: 100% !important;
+    max-width: 100vw !important;
+  }
+  .profile-card, .user-card, .aadhaar-card, .location-card, .activity-card {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .profile-content {
+    padding: 1rem !important;
+    overflow-x: hidden !important;
+    width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+  .profile-header {
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    padding: 1rem !important;
+    width: 100% !important;
+  }
+  .location-header {
+    flex-wrap: wrap !important;
+    gap: 1rem !important;
+  }
+
+  /* View Details Page Grids */
+  .details-grid-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+    width: 100% !important;
+  }
+  .details-main-col, .details-side-col {
+    width: 100% !important;
+    max-width: 100vw !important;
+  }
+  .details-card, .dashboard-section {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .details-content-container {
+    padding: 0.5rem !important;
+    width: 100vw !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+  .horizontal-gallery {
+    overflow-x: auto !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 12px !important;
+    padding-bottom: 0.5rem !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .hero-top-badges {
+    flex-wrap: wrap !important;
+  }
+  .admin-block {
+    word-break: break-word !important;
+  }
+  .doc-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+}
