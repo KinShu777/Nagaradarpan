@@ -125,7 +125,6 @@ function Dashboard() {
           </div>
           
           <div className="header-actions">
-            <InstallPWAButton />
             <button 
               className="action-btn location-btn" 
               onClick={() => { resetTargetRegion(); fetchLocation(); }}
@@ -136,6 +135,8 @@ function Dashboard() {
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
             </button>
+
+            <InstallPWAButton />
             
             <Link 
               to="/profile"
