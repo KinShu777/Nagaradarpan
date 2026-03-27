@@ -15,6 +15,22 @@ export function usePWA() {
       setInstallPrompt(e);
       setIsInstallable(true);
       console.log('PWA: Ready to install');
+
+      // -------------------------------------------------------------------
+      // AUTO-PROMPT LOGIC (As requested)
+      // Trigger the prompt after a short delay (1.5s)
+      // -------------------------------------------------------------------
+      const hasPromptedThisSession = sessionStorage.getItem('pwa_auto_prompted');
+      
+      if (!hasPromptedThisSession) {
+        const timer = setTimeout(() => {
+          console.log('PWA: Attempting automatic install prompt...');
+          e.prompt();
+          sessionStorage.setItem('pwa_auto_prompted', 'true');
+        }, 1500); // 1.5s delay for UX
+
+        return () => clearTimeout(timer);
+      }
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -25,18 +41,27 @@ export function usePWA() {
   }, []);
 
   const showInstallPrompt = async () => {
-    if (!installPrompt) return;
+    if (!installPrompt) {
+      console.warn('PWA: No install prompt available');
+      return;
+    }
 
-    // Show the install prompt
-    installPrompt.prompt();
+    try {
+      // Show the install prompt
+      await installPrompt.prompt();
 
-    // Wait for the user to respond to the prompt
-    const { outcome } = await installPrompt.userChoice;
-    console.log(`PWA: User response to the install prompt: ${outcome}`);
+      // Wait for the user to respond to the prompt
+      const { outcome } = await installPrompt.userChoice;
+      console.log(`PWA: User response to the install prompt: ${outcome}`);
 
-    // We've used the prompt, and can't use it again, so clear it
-    setInstallPrompt(null);
-    setIsInstallable(false);
+      // If user accepted, we clear the prompt
+      if (outcome === 'accepted') {
+        setInstallPrompt(null);
+        setIsInstallable(false);
+      }
+    } catch (err) {
+      console.error('PWA: Install prompt error', err);
+    }
   };
 
   return { isInstallable, showInstallPrompt };
