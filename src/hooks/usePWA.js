@@ -15,22 +15,6 @@ export function usePWA() {
       setInstallPrompt(e);
       setIsInstallable(true);
       console.log('PWA: Ready to install');
-
-      // -------------------------------------------------------------------
-      // AUTO-PROMPT LOGIC (As requested)
-      // Trigger the prompt after a short delay (1.5s)
-      // -------------------------------------------------------------------
-      const hasPromptedThisSession = sessionStorage.getItem('pwa_auto_prompted');
-      
-      if (!hasPromptedThisSession) {
-        const timer = setTimeout(() => {
-          console.log('PWA: Attempting automatic install prompt...');
-          e.prompt();
-          sessionStorage.setItem('pwa_auto_prompted', 'true');
-        }, 1500); // 1.5s delay for UX
-
-        return () => clearTimeout(timer);
-      }
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);

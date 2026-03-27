@@ -175,50 +175,16 @@ body {
   box-shadow: 0 2px 6px rgba(221, 107, 32, 0.4);
 }
 
-.install-pwa-btn {
+.install-btn {
   color: white;
   background-color: var(--accent);
   border: 2px solid #2F855A;
   box-shadow: 0 2px 6px rgba(56, 161, 105, 0.4);
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  position: relative;
-  z-index: 5;
 }
 
-.install-pwa-btn:hover {
+.install-btn:hover {
   background-color: #2F855A;
   transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(56, 161, 105, 0.6);
-}
-
-.install-pwa-btn::before {
-  content: '';
-  position: absolute;
-  top: -4px;
-  left: -4px;
-  right: -4px;
-  bottom: -4px;
-  border-radius: 50%;
-  background: rgba(56, 161, 105, 0.3);
-  z-index: -1;
-  animation: install-pulse 2s infinite;
-}
-
-@keyframes install-pulse {
-  0% { transform: scale(0.9); opacity: 1; }
-  100% { transform: scale(1.5); opacity: 0; }
-}
-
-.install-pwa-btn svg {
-  width: 22px;
-  height: 22px;
 }
 
 .profile-btn:hover {

@@ -8,7 +8,7 @@ const InstallPWAButton = () => {
 
   return (
     <button 
-      className="install-pwa-btn" 
+      className="action-btn install-btn" 
       onClick={showInstallPrompt}
       title="Install NagarDarpan App"
     >
