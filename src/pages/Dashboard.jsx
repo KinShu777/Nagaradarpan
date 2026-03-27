@@ -4,6 +4,7 @@ import Sidebar from '../components/Sidebar';
 import CivicMap from '../components/CivicMap';
 import { ProjectContext } from '../context/ProjectContext';
 import { isProjectInActiveGrid } from '../utils/gridUtils';
+import InstallPWAButton from '../components/InstallPWAButton';
 
 function Dashboard() {
   const [filter, setFilter] = useState('All');
@@ -124,6 +125,7 @@ function Dashboard() {
           </div>
           
           <div className="header-actions">
+            <InstallPWAButton />
             <button 
               className="action-btn location-btn" 
               onClick={() => { resetTargetRegion(); fetchLocation(); }}
