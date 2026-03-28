@@ -45,16 +45,19 @@ const generateProjectName = (category, areaName) => {
 };
 
 // Async Generator wrapping intelligent geocoding strings
-export const generateDynamicProjects = async (centerLat, centerLng) => {
+export const generateDynamicProjects = async (centerLat, centerLng, radius = 1) => {
   const areaName = await fetchAreaName(centerLat, centerLng);
-  const numProjects = getRandomInt(6, 12);
+  // Scale the project count exponentially to the grid coverage area
+  const numProjects = getRandomInt(6 * radius, 12 * radius * 1.2);
   const projects = [];
+
+  const spread = radius * 0.02; // Roughly 2km per radius scale
 
   for (let i = 0; i < numProjects; i++) {
     const category = getRandomItem(PROJECT_TYPES);
-    // Generate cluster offsets within an active 3x3 block radius (~ 2-3km)
-    const latOffset = (Math.random() * 0.04) - 0.02; 
-    const lngOffset = (Math.random() * 0.04) - 0.02; 
+    // Generate cluster offsets within the active block radius
+    const latOffset = (Math.random() * (spread * 2)) - spread; 
+    const lngOffset = (Math.random() * (spread * 2)) - spread; 
     
     projects.push({
       id: `dyn_${Date.now()}_${i}`,
@@ -84,6 +87,11 @@ export const ProjectProvider = ({ children }) => {
   const [isDefaultLocation, setIsDefaultLocation] = useState(false);
   const [projectsData, setProjectsData] = useState([]);
   const [isLocating, setIsLocating] = useState(true);
+
+  // New states for Advanced Grid and Exploration
+  const [gridRadius, setGridRadius] = useState(1);
+  const [exploreMode, setExploreMode] = useState(false);
+  const [exploreCenter, setExploreCenter] = useState(null);
 
   // Load custom projects securely from localStorage
   const sanitizeProjects = (projectsArr) => {
@@ -136,32 +144,54 @@ export const ProjectProvider = ({ children }) => {
   };
 
   // Core trigger injecting 1sec realistic latency mapping fresh network fetches
-  const fetchAndSetProjects = async (lat, lng, isDefault) => {
+  const fetchAndSetProjects = async (lat, lng, isDefault, radius = 1) => {
     setIsLocating(true);
-    await new Promise(resolve => setTimeout(resolve, 900)); // Simulated lag
-    const freshProjects = await generateDynamicProjects(lat, lng);
+    await new Promise(resolve => setTimeout(resolve, 800)); // Simulated lag
+    const freshProjects = await generateDynamicProjects(lat, lng, radius);
     setProjectsData(freshProjects);
+    setIsLocating(false);
+  };
+  
+  // A wrapper for manual location fetch
+  const triggerLocationUpdate = async (lat, lng, isDefault) => {
     setUserLocation([lat, lng]);
     setIsDefaultLocation(isDefault);
-    setIsLocating(false);
+    setExploreMode(false);
+    setExploreCenter(null);
+    await fetchAndSetProjects(lat, lng, isDefault, gridRadius);
+  };
+  
+  const handleExplorePin = async (lat, lng) => {
+    if (!exploreMode) return;
+    setExploreCenter([lat, lng]);
+    await fetchAndSetProjects(lat, lng, false, gridRadius);
   };
 
   const fetchLocation = () => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          fetchAndSetProjects(position.coords.latitude, position.coords.longitude, false);
+          triggerLocationUpdate(position.coords.latitude, position.coords.longitude, false);
         },
         (error) => {
           console.warn("Location permission denied. Fallback to Delhi.");
-          fetchAndSetProjects(FALLBACK_CENTER[0], FALLBACK_CENTER[1], true);
+          triggerLocationUpdate(FALLBACK_CENTER[0], FALLBACK_CENTER[1], true);
         },
         { timeout: 10000 }
       );
     } else {
-      fetchAndSetProjects(FALLBACK_CENTER[0], FALLBACK_CENTER[1], true);
+      triggerLocationUpdate(FALLBACK_CENTER[0], FALLBACK_CENTER[1], true);
     }
   };
+  
+  // React to grid size changes automatically
+  useEffect(() => {
+    if (userLocation) {
+      const activeLat = exploreMode && exploreCenter ? exploreCenter[0] : userLocation[0];
+      const activeLng = exploreMode && exploreCenter ? exploreCenter[1] : userLocation[1];
+      fetchAndSetProjects(activeLat, activeLng, isDefaultLocation, gridRadius);
+    }
+  }, [gridRadius, exploreMode]);
 
   // Continuous background tracking hook
   useEffect(() => {
@@ -216,7 +246,11 @@ export const ProjectProvider = ({ children }) => {
       addCustomProject,
       deleteCustomProject,
       isLocating,
-      fetchLocation
+      fetchLocation,
+      gridRadius, setGridRadius,
+      exploreMode, setExploreMode,
+      exploreCenter, setExploreCenter,
+      handleExplorePin
     }}>
       {children}
     </ProjectContext.Provider>

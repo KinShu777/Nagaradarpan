@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, ZoomControl, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, ZoomControl, useMap, useMapEvents } from 'react-leaflet';
 import { Link } from 'react-router-dom';
 import MapGrid from './MapGrid';
 import 'leaflet/dist/leaflet.css';
@@ -19,6 +19,15 @@ function MapController({ center, zoom }) {
   return null;
 }
 
+function MapEventsHandler({ onMapClick }) {
+  useMapEvents({
+    click(e) {
+      if (onMapClick) onMapClick(e.latlng.lat, e.latlng.lng);
+    }
+  });
+  return null;
+}
+
 const getCustomIcon = (category, isActive = false) => {
   const typeClass = category.toLowerCase();
   const activeClass = isActive ? 'marker-active' : '';
@@ -32,7 +41,7 @@ const getCustomIcon = (category, isActive = false) => {
   });
 };
 
-const CivicMap = ({ projects, userLocation, activeCenter, activeProject, onProjectClick }) => {
+const CivicMap = ({ projects, userLocation, activeCenter, activeProject, onProjectClick, exploreMode, exploreCenter, onExplorePin, gridRadius }) => {
   const [mount, setMount] = useState(false);
   useEffect(() => setMount(true), []);
 
@@ -58,9 +67,26 @@ const CivicMap = ({ projects, userLocation, activeCenter, activeProject, onProje
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
 
-        <MapGrid activeCenter={activeCenter} />
+        <MapGrid activeCenter={activeCenter} gridRadius={gridRadius} />
+        <MapEventsHandler onMapClick={onExplorePin} />
 
         <MapController center={centerToUse} zoom={zoomLevel} />
+
+        {exploreMode && exploreCenter && (
+          <Marker 
+            position={exploreCenter} 
+            icon={L.divIcon({
+              className: 'explore-pin-icon',
+              html: `<div class="marker-pin marker-explore">
+                       <div class="pulse-explore"></div>
+                     </div>`,
+              iconSize: [28, 28],
+              iconAnchor: [14, 14]
+            })}
+          >
+            <Popup><strong>Explore Here</strong></Popup>
+          </Marker>
+        )}
 
         <Marker 
           position={userLocation} 

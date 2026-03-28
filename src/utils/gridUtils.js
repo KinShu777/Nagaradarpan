@@ -35,20 +35,21 @@ export const getActiveGridBounds = (centerLat, centerLng) => {
   return { minLat, maxLat, minLng, maxLng };
 };
 
-export const isProjectInActiveGrid = (lat, lng, centerLat, centerLng) => {
+export const isProjectInActiveGrid = (lat, lng, centerLat, centerLng, radius = 1) => {
   const [pLatIdx, pLngIdx] = getBlockIndices(lat, lng);
   const [cLatIdx, cLngIdx] = getBlockIndices(centerLat, centerLng);
 
-  return Math.abs(pLatIdx - cLatIdx) <= 1 && Math.abs(pLngIdx - cLngIdx) <= 1;
+  return Math.abs(pLatIdx - cLatIdx) <= radius && Math.abs(pLngIdx - cLngIdx) <= radius;
 };
 
-export const generateVisibleGridRectangles = (centerLat, centerLng) => {
+export const generateVisibleGridRectangles = (centerLat, centerLng, radius = 1) => {
   const [cLatIdx, cLngIdx] = getBlockIndices(centerLat, centerLng);
   const rectangles = [];
   
-  // 11x11 grid array to cover the viewport seamlessly
-  for (let latOffset = -5; latOffset <= 5; latOffset++) {
-    for (let lngOffset = -5; lngOffset <= 5; lngOffset++) {
+  // Grid array to cover the viewport seamlessly
+  // For larger radius, we might need a larger grid, but -7 to 7 covers 15x15 which is enough for radius=3 (7x7) + padding
+  for (let latOffset = -7; latOffset <= 7; latOffset++) {
+    for (let lngOffset = -7; lngOffset <= 7; lngOffset++) {
       const latGridIdx = cLatIdx + latOffset;
       const lngGridIdx = cLngIdx + lngOffset;
       
@@ -60,7 +61,7 @@ export const generateVisibleGridRectangles = (centerLat, centerLng) => {
       rectangles.push({
         id: `grid-${latGridIdx}-${lngGridIdx}`,
         bounds: [[minLat, minLng], [maxLat, maxLng]],
-        isActive: Math.abs(latOffset) <= 1 && Math.abs(lngOffset) <= 1 // Center 3x3 block is active
+        isActive: Math.abs(latOffset) <= radius && Math.abs(lngOffset) <= radius 
       });
     }
   }

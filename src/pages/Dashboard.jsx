@@ -16,7 +16,11 @@ function Dashboard() {
     isDefaultLocation, 
     projectsData, 
     isLocating, 
-    fetchLocation 
+    fetchLocation,
+    gridRadius, setGridRadius,
+    exploreMode, setExploreMode,
+    exploreCenter, setExploreCenter,
+    handleExplorePin
   } = useContext(ProjectContext);
 
   const [showLoading, setShowLoading] = useState(isLocating);
@@ -35,15 +39,15 @@ function Dashboard() {
     }
   }, [isLocating, showLoading]);
 
-  // Prevent map from shifting automatically when user clicks a project
-  const activeCenter = userLocation; 
+  // Use exploreCenter if in explore mode
+  const activeCenter = exploreMode && exploreCenter ? exploreCenter : userLocation; 
 
   const filteredProjects = useMemo(() => {
     if (!activeCenter) return [];
 
-    // Smart logic: Only show projects in the active 3x3 grid relative to activeCenter
+    // Smart logic: Only show projects in the active grid relative to activeCenter
     let filtered = projectsData.filter(p => 
-      isProjectInActiveGrid(p.lat, p.lng, activeCenter[0], activeCenter[1])
+      isProjectInActiveGrid(p.lat, p.lng, activeCenter[0], activeCenter[1], gridRadius)
     );
 
     if (filter !== 'All') {
@@ -152,7 +156,7 @@ function Dashboard() {
         </div>
       </header>
       
-      <div className="main-content">
+      <div className="main-content" style={{ position: 'relative' }}>
         <Sidebar 
           projects={filteredProjects} 
           onProjectClick={handleProjectClick} 
@@ -160,12 +164,61 @@ function Dashboard() {
           isMobileOpen={isMobileListOpen}
           toggleMobileOpen={() => setIsMobileListOpen(!isMobileListOpen)}
         />
+        
+        <div className="map-overlay-controls">
+          <div className="control-group">
+            <span className="control-label">Mode:</span>
+            <div className="toggle-btns">
+              <button 
+                className={`toggle-btn ${!exploreMode ? 'active' : ''}`}
+                onClick={() => { setExploreMode(false); setExploreCenter(null); }}
+              >
+                My Location
+              </button>
+              <button 
+                className={`toggle-btn ${exploreMode ? 'active' : ''}`}
+                onClick={() => setExploreMode(true)}
+              >
+                Explore Area
+              </button>
+            </div>
+          </div>
+
+          <div className="control-group">
+            <span className="control-label">Grid View:</span>
+            <div className="toggle-btns">
+              <button 
+                className={`toggle-btn ${gridRadius === 1 ? 'active' : ''}`}
+                onClick={() => setGridRadius(1)}
+              >
+                Small
+              </button>
+              <button 
+                className={`toggle-btn ${gridRadius === 2 ? 'active' : ''}`}
+                onClick={() => setGridRadius(2)}
+              >
+                Medium
+              </button>
+              <button 
+                className={`toggle-btn ${gridRadius === 3 ? 'active' : ''}`}
+                onClick={() => setGridRadius(3)}
+              >
+                Large
+              </button>
+            </div>
+          </div>
+        </div>
+
         <CivicMap 
           projects={filteredProjects}
           userLocation={userLocation}
           activeCenter={activeCenter}
           activeProject={activeProject}
           onProjectClick={handleProjectClick}
+          exploreMode={exploreMode}
+          exploreCenter={exploreCenter}
+          onExplorePin={handleExplorePin}
+          gridRadius={gridRadius}
         />
       </div>
     </div>

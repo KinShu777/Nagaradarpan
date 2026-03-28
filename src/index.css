@@ -2869,3 +2869,100 @@ button, .action-btn, .filter-btn {
     gap: 1rem !important;
   }
 }
+
+/* --- Advanced Grid & Explore Mode --- */
+.map-overlay-controls {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.map-overlay-controls .control-group {
+  background: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  pointer-events: auto;
+  border: 1px solid var(--border);
+}
+
+.control-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.toggle-btns {
+  display: flex;
+  background: var(--surface);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.toggle-btn {
+  background: transparent;
+  border: none;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4A5568;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-right: 1px solid var(--border);
+}
+
+.toggle-btn:last-child {
+  border-right: none;
+}
+
+.toggle-btn:hover {
+  background: #E2E8F0;
+}
+
+.toggle-btn.active {
+  background: var(--primary);
+  color: white;
+}
+
+/* Explore Pin Styles */
+.marker-explore {
+  background-color: #1A202C !important;
+  border: 3px solid white !important;
+  border-radius: 50% !important;
+  width: 24px !important;
+  height: 24px !important;
+  position: relative;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3) !important;
+}
+
+.pulse-explore {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border: 2px solid #1A202C;
+  border-radius: 50%;
+  animation: explore-pulse 2s infinite ease-out;
+}
+
+@keyframes explore-pulse {
+  0% { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Add grid rectangle animation */
+.grid-rect-transition {
+  transition: opacity 0.5s ease, fill-opacity 0.5s ease;
+}
